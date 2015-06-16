@@ -35,9 +35,15 @@ static NSString * const MyURLProtocolHandledKey = @"MyURLProtocolHandledKey";
 }
 
 + (NSURLRequest *) canonicalRequestForRequest:(NSURLRequest *)request {
-    return request;
+    NSMutableURLRequest *mutableReqeust = [request mutableCopy];
+    mutableReqeust = [self redirectHostInRequset:mutableReqeust];
+    return mutableReqeust;
 }
 
++ (BOOL)requestIsCacheEquivalent:(NSURLRequest *)a toRequest:(NSURLRequest *)b
+{
+    return [super requestIsCacheEquivalent:a toRequest:b];
+}
 
 - (void)startLoading
 {
@@ -62,7 +68,7 @@ static NSString * const MyURLProtocolHandledKey = @"MyURLProtocolHandledKey";
     
     //打标签，防止无限循环
     [NSURLProtocol setProperty:@YES forKey:MyURLProtocolHandledKey inRequest:mutableReqeust];
-    mutableReqeust = [self redirectHostInRequset:mutableReqeust];
+    
     self.connection = [NSURLConnection connectionWithRequest:mutableReqeust delegate:self];
 }
 
@@ -91,7 +97,7 @@ static NSString * const MyURLProtocolHandledKey = @"MyURLProtocolHandledKey";
 
 #pragma mark -- private
 
--(NSMutableURLRequest*)redirectHostInRequset:(NSMutableURLRequest*)request
++(NSMutableURLRequest*)redirectHostInRequset:(NSMutableURLRequest*)request
 {
     if ([request.URL host].length == 0) {
         return request;
