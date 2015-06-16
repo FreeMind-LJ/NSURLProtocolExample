@@ -8,7 +8,7 @@
 
 #import "CustomURLProtocol.h"
 
-static NSString * const MyURLProtocolHandledKey = @"MyURLProtocolHandledKey";
+static NSString * const URLProtocolHandledKey = @"URLProtocolHandledKey";
 
 @interface CustomURLProtocol ()<NSURLConnectionDelegate>
 
@@ -25,7 +25,8 @@ static NSString * const MyURLProtocolHandledKey = @"MyURLProtocolHandledKey";
     if ( ([scheme caseInsensitiveCompare:@"http"] == NSOrderedSame ||
      [scheme caseInsensitiveCompare:@"https"] == NSOrderedSame))
     {
-        if ([NSURLProtocol propertyForKey:MyURLProtocolHandledKey inRequest:request]) {
+        //看看是否已经处理过了，防止无限循环
+        if ([NSURLProtocol propertyForKey:URLProtocolHandledKey inRequest:request]) {
             return NO;
         }
         
@@ -67,7 +68,7 @@ static NSString * const MyURLProtocolHandledKey = @"MyURLProtocolHandledKey";
     NSMutableURLRequest *mutableReqeust = [[self request] mutableCopy];
     
     //打标签，防止无限循环
-    [NSURLProtocol setProperty:@YES forKey:MyURLProtocolHandledKey inRequest:mutableReqeust];
+    [NSURLProtocol setProperty:@YES forKey:URLProtocolHandledKey inRequest:mutableReqeust];
     
     self.connection = [NSURLConnection connectionWithRequest:mutableReqeust delegate:self];
 }
